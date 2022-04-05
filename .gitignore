@@ -1,0 +1,7 @@
+# MAIN
+.vscode
+
+# RUST
+rust/target
+
+# WEBSITE
