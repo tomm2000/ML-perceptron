@@ -1,11 +1,10 @@
-export class Matrix {
-  rows: number
-  cols: number
+import { Matrix } from "./Matrix"
+
+export class MatrixCPU extends Matrix {
   data: number[][]
 
   constructor(rows: number, cols: number) {
-    this.rows = rows
-    this.cols = cols
+    super(rows, cols)
     this.data = []
 
     // for(let col = 0; col < cols; col ++) {
@@ -49,7 +48,7 @@ export class Matrix {
   }
 
   static fromArrayRow(array: number[]): Matrix {
-    let matrix = new Matrix(1, array.length)
+    let matrix = new MatrixCPU(1, array.length)
     for(let i = 0; i < array.length; i++) {
       matrix.set(0, i, array[i]);
     }
@@ -57,7 +56,7 @@ export class Matrix {
   }
 
   static fromArrayCol(array: number[]): Matrix {
-    let matrix = new Matrix(array.length, 1)
+    let matrix = new MatrixCPU(array.length, 1)
     for(let i = 0; i < array.length; i++) {
       matrix.set(i, 0, array[i]);
     }

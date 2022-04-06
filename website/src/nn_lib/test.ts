@@ -1,8 +1,6 @@
-import * as GPU_MATRIX from "./matrix_gpu/Matrix";
-import * as GPU_MATH from "./matrix_gpu/matrix_math";
-
-import * as CPU_MATRIX from "./matrix_cpu/Matrix";
-import * as CPU_MATH from "./matrix_cpu/matrix_math";
+import { MatrixGPU } from "./math/MatrixGPU";
+import { MatrixCPU } from "./math/MatrixCPU";
+import { applyPos, productCPU, productGPU } from "./math/matrix_math";
 
 import { Network } from "./Network";
 
@@ -26,29 +24,26 @@ export function xorTest() {
   // }
 
   console.time('init')
-  let matrix11 = new CPU_MATRIX.Matrix(700, 300)
-  let matrix12 = new CPU_MATRIX.Matrix(300, 400)
+  let matrix11 = new MatrixCPU(700, 300)
+  let matrix12 = new MatrixCPU(300, 400)
 
-  let matrix21 = new GPU_MATRIX.Matrix(700, 300)
-  let matrix22 = new GPU_MATRIX.Matrix(300, 400)
+  let matrix21 = new MatrixGPU(700, 300)
+  let matrix22 = new MatrixGPU(300, 400)
   console.timeEnd('init')
 
-  CPU_MATH.applyPos(matrix11)
-  CPU_MATH.applyPos(matrix12)
+  applyPos(matrix11)
+  applyPos(matrix12)
 
-  
-  // console.log(matrix11.toString())
-  // console.log(matrix12.toString())
 
   console.time('cpu')
   // console.log(CPU_MATH.product(matrix11, matrix12).toString())
-  CPU_MATH.product(matrix11, matrix12)
+  productCPU(matrix11, matrix12, 'CPU')
   console.timeEnd('cpu')
 
 
 
-  GPU_MATH.applyPos(matrix21)
-  GPU_MATH.applyPos(matrix22)
+  applyPos(matrix21)
+  applyPos(matrix22)
   
   // console.log(`matrix21\n${matrix21.toString()}`)
   // console.log(`matrix22\n${matrix22.toString()}`)
@@ -56,6 +51,6 @@ export function xorTest() {
 
   console.time('gpu')
   // console.log(`result\n${GPU_MATH.product(matrix21, matrix22).toString()}`)
-  GPU_MATH.product(matrix21, matrix22)
+  productGPU(matrix21, matrix22)
   console.timeEnd('gpu')
 }

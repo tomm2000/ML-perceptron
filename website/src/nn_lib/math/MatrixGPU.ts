@@ -1,13 +1,11 @@
+import { Matrix } from "./Matrix"
 import { gridToArray } from "./matrix_math"
 
-export class Matrix {
-  rows: number
-  cols: number
+export class MatrixGPU extends Matrix {
   data: Float32Array
 
   constructor(rows: number, cols: number, data?: Float32Array) {
-    this.rows = rows
-    this.cols = cols
+    super(rows, cols)
     this.data = data || new Float32Array(rows * cols * 4)
   }
 
@@ -39,7 +37,7 @@ export class Matrix {
   }
 
   static fromArrayRow(array: number[]): Matrix {
-    let matrix = new Matrix(1, array.length)
+    let matrix = new MatrixGPU(1, array.length)
     for(let i = 0; i < array.length; i++) {
       matrix.set(0, i, array[i]);
     }
@@ -47,7 +45,7 @@ export class Matrix {
   }
 
   static fromArrayCol(array: number[]): Matrix {
-    let matrix = new Matrix(array.length, 1)
+    let matrix = new MatrixGPU(array.length, 1)
     for(let i = 0; i < array.length; i++) {
       matrix.set(i, 0, array[i]);
     }
