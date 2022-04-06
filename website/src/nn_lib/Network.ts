@@ -1,5 +1,5 @@
-import { Matrix } from "./Matrix"
-import { applyDsigmoid, applySigmoid, mul, mulScalar, product, randomize, sub, sum, transpose } from "./matrix_math_cpu"
+import { Matrix } from "./matrix_cpu/Matrix"
+import { applyDsigmoid, applySigmoid, mul, mulScalar, product, randomize, sub, sum, transpose } from "./matrix_cpu/matrix_math"
 
 export class Network {
   private layer_size: number[]
