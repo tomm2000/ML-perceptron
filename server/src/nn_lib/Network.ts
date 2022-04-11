@@ -1,25 +1,20 @@
-import { Matrix } from "./math/Matrix"
-import { MatrixCPU } from "./math/MatrixCPU"
-import { applyDsigmoid, applySigmoid, getClasses, MATRIX_CLASS, MATRIX_TYPE, mul, mulScalar, productCPU, randomize, sub, sum, transpose } from "./math/matrix_math"
+import { Matrix } from "./Matrix.js"
+import { applyDsigmoid, applySigmoid, divScalar, mul, mulScalar, product, productCPU, randomize, sub, sum, transpose } from "./matrix_math.js"
 
 export class Network {
   private layer_size: number[]
   private weights: Matrix[]
-  private type: MATRIX_TYPE
-  private MatrixClass: MATRIX_CLASS
 
-  constructor(layer_size: number[], type: MATRIX_TYPE = 'CPU') {
+  constructor(layer_size: number[]) {
     this.layer_size = layer_size
     this.weights = []
-    this.type = type
-    this.MatrixClass = getClasses()[type]
 
     for(let i = 0; i < layer_size.length - 1; i++) {
       let layer = layer_size[i]
 
       if(i == 0) { layer += 1 }
 
-      this.weights[i] = new this.MatrixClass(layer_size[i+1], layer)
+      this.weights[i] = new Matrix(layer_size[i+1], layer)
       randomize(this.weights[i])
     }
   }
@@ -30,24 +25,31 @@ export class Network {
     // BIAS
     input_array.push(1);
 
-    let outputs = this.MatrixClass.fromArrayCol(input_array)
+    let outputs = Matrix.fromArrayCol(input_array)
 
     // console.log(outputs.toString())
 
     for(let i = 0; i < this.weights.length; i++) {
-      outputs = productCPU(this.weights[i], outputs, 'CPU')
+      // console.log(outputs.toString())
+      outputs = product(this.weights[i], outputs)
+
+      //TODO: trovare soluzione più corretta?
+      divScalar(outputs, this.weights[i].cols)
+      // console.log(this.weights[i].cols)
 
       applySigmoid(outputs)
     }
+
+    console.log(outputs.toString())
 
     return outputs
   }
 
   getErrors(input_array: number[], target_array: number[]): Matrix {
     let outputs = this.feedForward(input_array)
-    let targets = this.MatrixClass.fromArrayCol(target_array)
+    let targets = Matrix.fromArrayCol(target_array)
 
-    return sub(targets, outputs, this.type)
+    return sub(targets, outputs)
   }
 
   getMeanError(input_array: number[], target_array: number[]): number {
@@ -82,38 +84,39 @@ export class Network {
     let inputs = input_array.slice()
     inputs.push(1)
 
-    let outputs = [this.MatrixClass.fromArrayCol(inputs)]
+    let outputs = [Matrix.fromArrayCol(inputs)]
 
     for(let i = 0; i < this.weights.length; i++) {
-      let tmp = productCPU(this.weights[i], outputs[i])
+      let tmp = product(this.weights[i], outputs[i])
 
       applySigmoid(tmp)
       outputs.push(tmp)
+
     }
     //-========================-
 
     //-==== BACK PROPAGATION ====-
-    let error = sub(this.MatrixClass.fromArrayCol(target_array), outputs[outputs.length-1], this.type)
+    let error = sub(Matrix.fromArrayCol(target_array), outputs[outputs.length-1])
 
     for(let i = this.weights.length - 1; i >= 0; i--) {
       // ---- GRADIENT ----
       applyDsigmoid(outputs[i+1])
-      let gradient = mul(error, outputs[i+1], this.type)
+      let gradient = mul(error, outputs[i+1])
       mulScalar(gradient, learning_rate)
       // ------------------
 
       // ---- DELTA -------
       let t_outputs = transpose(outputs[i])
 
-      let delta = productCPU(gradient, t_outputs)
+      let delta = product(gradient, t_outputs)
       // ------------------
 
       //---- UPDATE WEIGHTS ----
       let t_weights = transpose(this.weights[i])
 
-      error = productCPU(t_weights, error)
+      error = product(t_weights, error)
 
-      this.weights[i] = sum(this.weights[i], delta, this.type)
+      this.weights[i] = sum(this.weights[i], delta)
       // -----------------------
     //-========================-
     }

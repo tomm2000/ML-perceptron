@@ -1,31 +1,32 @@
-import { Matrix } from "./Matrix"
+import { gridToArray } from "./matrix_math.js"
 
-export class MatrixCPU extends Matrix {
-  data: number[][]
+export class Matrix {
+  data: Float32Array
+  rows: number
+  cols: number
 
-  constructor(rows: number, cols: number) {
-    super(rows, cols)
-    this.data = []
-
-    for(let row = 0; row < rows; row ++) {
-      for(let col = 0; col < cols; col ++) {
-        this.data[row] = this.data[row] || []
-        this.data[row][col] = 0
-      }
-    }
+  constructor(rows: number, cols: number, data?: Float32Array) {
+    this.rows = rows
+    this.cols = cols
+    this.data = data || new Float32Array(rows * cols * 4)
   }
 
   set(row: number, col: number, value: number) {
-    this.data[row][col] = value
+    this.data[gridToArray(row, col, this.rows, this.cols, 4)] = value
   }
 
   get(row: number, col: number): number {
-    return this.data[row][col]
+    return this.data[gridToArray(row, col, this.rows, this.cols, 4)]
   }
 
-  toArray() {
+  toArray(): number[] {
     if(this.rows == 1) {
-      return this.data[0]
+      let result: number[] = []
+      for(let i = 0; i < this.cols; i++) {
+        result[i] = this.get(0, i)
+      }
+      return result
+
     } else if(this.cols == 1) {
       let result = []
       for(let row = 0; row < this.rows; row ++) {
@@ -38,7 +39,7 @@ export class MatrixCPU extends Matrix {
   }
 
   static fromArrayRow(array: number[]): Matrix {
-    let matrix = new MatrixCPU(1, array.length)
+    let matrix = new Matrix(1, array.length)
     for(let i = 0; i < array.length; i++) {
       matrix.set(0, i, array[i]);
     }
@@ -46,7 +47,7 @@ export class MatrixCPU extends Matrix {
   }
 
   static fromArrayCol(array: number[]): Matrix {
-    let matrix = new MatrixCPU(array.length, 1)
+    let matrix = new Matrix(array.length, 1)
     for(let i = 0; i < array.length; i++) {
       matrix.set(i, 0, array[i]);
     }
