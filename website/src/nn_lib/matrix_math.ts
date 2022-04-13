@@ -1,18 +1,5 @@
-import { GPGPU } from "../../lib/GPGPU";
+import { GPGPU } from "../lib/GPGPU";
 import { Matrix } from "./Matrix";
-import { MatrixCPU } from "./MatrixCPU";
-import { MatrixGPU } from "./MatrixGPU";
-
-export type MATRIX_TYPE = 'CPU' | 'GPU'
-
-export type MATRIX_CLASS = typeof MatrixCPU | typeof MatrixGPU
-
-export function getClasses() {
-  return {
-    'CPU': MatrixCPU,
-    'GPU': MatrixGPU,
-  }
-}
 
 // ---- MISC ----
 export function gridToArray(row: number, col: number, rows: number, cols: number, scale: number = 1): number {
@@ -42,19 +29,17 @@ export function sumScalar(matrix: Matrix, scalar: number) { applyLambda(matrix, 
 export function subScalar(matrix: Matrix, scalar: number) { applyLambda(matrix, (value) => value - scalar) }
 export function mulScalar(matrix: Matrix, scalar: number) { applyLambda(matrix, (value) => value * scalar) }
 export function divScalar(matrix: Matrix, scalar: number) { applyLambda(matrix, (value) => value / scalar) }
-export function randomize(matrix: Matrix) { applyLambda(matrix, (_) => Math.random()) }
+export function randomize(matrix: Matrix) { applyLambda(matrix, (_) => Math.random() * 2 - 1) }
 export function applySigmoid(matrix: Matrix) { applyLambda(matrix, (value) => 1 / (1 + Math.exp(-value))) }
 export function applyDsigmoid(matrix: Matrix) { applyLambda(matrix, (value) => value * (1 - value)) }
 export function oneMinus(matrix: Matrix) { applyLambda(matrix, (value) => 1 - value) }
 
 // ---- ELEMENT-WISE MATH ----
-export function applyEwLambda(matrix1: Matrix, matrix2: Matrix, type: MATRIX_TYPE, lambda: (value1: number, value2: number) => number): Matrix {
+export function applyEwLambda(matrix1: Matrix, matrix2: Matrix, lambda: (value1: number, value2: number) => number): Matrix {
   if(matrix1.cols !== matrix2.cols || matrix1.rows !== matrix2.rows) {
-    throw new Error("Matrices must be the same size");
+    throw new Error("EwLambda: Matrices must be the same size");
   }
-
-  let c = getClasses()[type]
-  let result = new c(matrix1.rows, matrix1.cols);
+  let result = new Matrix(matrix1.rows, matrix1.cols);
 
   for(let row = 0; row < matrix1.rows; row ++) {
     for(let col = 0; col < matrix1.cols; col ++) {
@@ -68,10 +53,10 @@ export function applyEwLambda(matrix1: Matrix, matrix2: Matrix, type: MATRIX_TYP
   return result
 }
 
-export function sum(matrix1: Matrix, matrix2: Matrix, type: MATRIX_TYPE): Matrix { return applyEwLambda(matrix1, matrix2, type, (value1, value2) => value1 + value2) }
-export function sub(matrix1: Matrix, matrix2: Matrix, type: MATRIX_TYPE): Matrix { return applyEwLambda(matrix1, matrix2, type, (value1, value2) => value1 - value2) }
-export function mul(matrix1: Matrix, matrix2: Matrix, type: MATRIX_TYPE): Matrix { return applyEwLambda(matrix1, matrix2, type, (value1, value2) => value1 * value2) }
-export function div(matrix1: Matrix, matrix2: Matrix, type: MATRIX_TYPE): Matrix { return applyEwLambda(matrix1, matrix2, type, (value1, value2) => value1 / value2) }
+export function sum(matrix1: Matrix, matrix2: Matrix): Matrix { return applyEwLambda(matrix1, matrix2, (value1, value2) => value1 + value2) }
+export function sub(matrix1: Matrix, matrix2: Matrix): Matrix { return applyEwLambda(matrix1, matrix2, (value1, value2) => value1 - value2) }
+export function mul(matrix1: Matrix, matrix2: Matrix): Matrix { return applyEwLambda(matrix1, matrix2, (value1, value2) => value1 * value2) }
+export function div(matrix1: Matrix, matrix2: Matrix): Matrix { return applyEwLambda(matrix1, matrix2, (value1, value2) => value1 / value2) }
 
 
 // ---- MATRIX MATH ----
@@ -109,7 +94,8 @@ const productShader = /*glsl*/`
   }
 `
 
-export function productGPU(matrix1: MatrixGPU, matrix2: MatrixGPU): MatrixGPU {
+//TODO: DA CONTROLLARE
+export function productGPU(matrix1: Matrix, matrix2: Matrix): Matrix {
   if(matrix1.cols !== matrix2.rows) { throw new Error("Matrix dimensions do not match"); }
 
   let rows = matrix1.rows
@@ -144,7 +130,7 @@ export function productGPU(matrix1: MatrixGPU, matrix2: MatrixGPU): MatrixGPU {
   // ----------------
 
   // ---- 70% ms ----
-  let out = new MatrixGPU(rows, cols, gpu.getPixels())
+  let out = new Matrix(rows, cols, gpu.getPixels())
   // ----------------
 
   gpu.delete()
@@ -152,13 +138,12 @@ export function productGPU(matrix1: MatrixGPU, matrix2: MatrixGPU): MatrixGPU {
   return out
 }
 
-export function productCPU(matrix1: Matrix, matrix2: Matrix, type: MATRIX_TYPE = 'CPU'): Matrix {
+export function productCPU(matrix1: Matrix, matrix2: Matrix): Matrix {
   if(matrix1.cols !== matrix2.rows) {
-    throw new Error("Matrix dimensions do not match");
+    throw new Error(`Matrix dimensions do not match: 1-cols: ${matrix1.cols} and 2-rows: ${matrix2.rows}`);
   }
 
-  let c = getClasses()[type]
-  let result = new c(matrix1.rows, matrix1.cols);
+  let result = new Matrix(matrix1.rows, matrix2.cols);
 
   for(let row = 0; row < matrix1.rows; row ++) {
     for(let col = 0; col < matrix2.cols; col ++) {
@@ -175,9 +160,12 @@ export function productCPU(matrix1: Matrix, matrix2: Matrix, type: MATRIX_TYPE =
   return result
 }
 
-export function transpose(matrix: Matrix, type: MATRIX_TYPE = 'CPU'): Matrix {
-  let c = getClasses()[type]
-  let result = new c(matrix.rows, matrix.cols);
+export function product(matrix1: Matrix, matrix2: Matrix): Matrix {
+  return productCPU(matrix1, matrix2)
+}
+
+export function transpose(matrix: Matrix): Matrix {
+  let result = new Matrix(matrix.cols, matrix.rows);
 
   for(let row = 0; row < matrix.rows; row ++) {
     for(let col = 0; col < matrix.cols; col ++) {

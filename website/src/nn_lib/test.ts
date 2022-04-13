@@ -1,31 +1,59 @@
-import { MatrixGPU } from "./math/MatrixGPU";
-import { MatrixCPU } from "./math/MatrixCPU";
-import { applyPos, productCPU, productGPU } from "./math/matrix_math";
-
+import { getMaxIndex, loadMNIST, prepareRandomData } from "../lib/mnist";
 import { Network } from "./Network";
-const MNIST = require('mnist-javascript')
 
-// type setType = {
-//   training: { input: number[], output: number[] }[],
-//   test: { input: number[], output: number[] }[]
-// }
 
-export function xorTest() {
-  const mnist = new MNIST()
+const network = new Network([784, 100, 10]);
 
-  // let set: setType = mnist.set(8000, 100)
+export async function train() {
+  let mnist = await loadMNIST()
 
-  // let { training, test } = set
-  // let network = new Network([784, 200, 10], 'CPU')
+  let training = prepareRandomData(mnist.train_images, mnist.train_labels, 1000);
 
-  // for(let data of training) {
-  //   network.train(data.input, data.output, 0.1)
-  // }
+  console.log('training begin')
+  console.time("train");
+  for(let data of training) {
+    network.train(data.input, data.output, 0.1);
+  }
+  console.timeEnd("train");
+}
 
-  // console.log('trained')
+export async function test() {
+  let mnist = await loadMNIST()
 
-  // for(let data of test) {
-  //   let meanError = network.getMeanError(data.input, data.output)
-  //   console.log(meanError)
-  // }
+  let testing = prepareRandomData(mnist.test_images, mnist.test_labels, 100);
+
+  let correct = 0;
+  for(let data of testing) {
+    let output = network.feedForward(data.input).toArray();
+    let maxIndex = getMaxIndex(output);
+    if(maxIndex == getMaxIndex(data.output)) {
+      correct++;
+    }
+  }
+
+  console.log('correct: ' + correct / testing.length * 100 + "%");
+}
+
+export function predict(data: number[]): number {
+  return getMaxIndex(network.feedForward(data).toArray());
+}
+
+export function indexToGrid(index: number, size: number) {
+  return { x: Math.floor(index / size), y: index % size };
+}
+
+export function gridToIndex(x: number, y: number, size: number) {
+  return x * size + y;
+}
+
+export function gridScale(x1: number, y1: number, x2: number, y2: number, scale: number) {
+  let x = x1 * scale + x2
+  let y = y1 * scale + y2
+  return { x, y };
+}
+
+export function gridScaleCoords(p1: {x: number, y: number}, p2: {x: number, y: number}, scale: number) {
+  let x = p1.x * scale + p2.x
+  let y = p1.y * scale + p2.y
+  return { x, y };
 }
