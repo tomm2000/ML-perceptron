@@ -122,4 +122,15 @@ export class Network {
     }
     return result
   }
+  
+  guessY(x: number){
+    let w = this.weights[0].toArray()
+
+    let w0 = w[0]
+    let w1 = w[1]
+    let w2 = w[2]
+
+    // 
+    return -(w2/w1) - (w0/w1)  * x
+  }
 }

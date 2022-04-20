@@ -57,3 +57,4 @@ export function gridScaleCoords(p1: {x: number, y: number}, p2: {x: number, y: n
   let y = p1.y * scale + p2.y
   return { x, y };
 }
+
