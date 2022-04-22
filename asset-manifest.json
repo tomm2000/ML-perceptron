@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/tomm2000/ML-perceptron/static/css/main.d1e4b778.css",
-    "main.js": "/tomm2000/ML-perceptron/static/js/main.88a01f36.js",
-    "index.html": "/tomm2000/ML-perceptron/index.html",
-    "main.d1e4b778.css.map": "/tomm2000/ML-perceptron/static/css/main.d1e4b778.css.map",
-    "main.88a01f36.js.map": "/tomm2000/ML-perceptron/static/js/main.88a01f36.js.map"
+    "main.css": "/ML-perceptron/static/css/main.d1e4b778.css",
+    "main.js": "/ML-perceptron/static/js/main.88a01f36.js",
+    "index.html": "/ML-perceptron/index.html",
+    "main.d1e4b778.css.map": "/ML-perceptron/static/css/main.d1e4b778.css.map",
+    "main.88a01f36.js.map": "/ML-perceptron/static/js/main.88a01f36.js.map"
   },
   "entrypoints": [
     "static/css/main.d1e4b778.css",
