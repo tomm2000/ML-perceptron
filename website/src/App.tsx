@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
 import Layout from './pages/layout';
 import MnistPage from './pages/mnist';
 import LinerTest from './pages/LinearTest';
+import XorExample from './pages/xor';
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
             <Route path="/" element= {<Prova1 />} />
             <Route path = "/mnist" element={<MnistPage />} />
             <Route path = "/line" element={<LinerTest />} />
+            <Route path = "/xor" element={<XorExample />} />
           </Routes>
         </Layout>
       </Router>

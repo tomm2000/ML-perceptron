@@ -3,7 +3,7 @@ import '../assets/styles/mnist.scss';
 
 // import P5 from 'p5'
 import Sketch from 'react-p5';
-import { gridScale, gridScaleCoords, gridToIndex, indexToGrid, train, test, predict } from '../nn_lib/test';
+import { gridScale, gridScaleCoords, gridToIndex, indexToGrid, train, test, predict } from '../nn_lib/mnist_roba';
 
 function MnistPage() {
 

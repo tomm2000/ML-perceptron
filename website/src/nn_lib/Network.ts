@@ -1,5 +1,5 @@
 import { Matrix } from "./Matrix"
-import { applyDsigmoid, applySigmoid, mul, mulScalar, product, randomize, sub, sum, transpose } from "./matrix_math"
+import { applyDsigmoid, applyLambda, applySigmoid, mul, mulScalar, product, randomize, sub, sum, transpose } from "./matrix_math"
 
 export class Network {
   private layer_size: number[]
@@ -126,6 +126,11 @@ export class Network {
   guessY(x: number){
     let w = this.weights[0].toArray()
 
+    // if(k % 60 == 0){
+    //   console.log(w)
+    // }
+    // k++
+
     let w0 = w[0]
     let w1 = w[1]
     let w2 = w[2]
@@ -134,3 +139,5 @@ export class Network {
     return -(w2/w1) - (w0/w1)  * x
   }
 }
+
+let k = 0

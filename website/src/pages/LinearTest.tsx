@@ -5,12 +5,18 @@ import Sketch from "react-p5";
 import { Point, f } from "../nn_lib/Point";
 import { Network } from "../nn_lib/Network";
 
+import '../assets/styles/perceptron.scss'
+
 function LinearTest() {
-  let points: Point[] = new Array(200);
+  let points: Point[] = new Array(500);
   let x = 50;
   let y = 50;
   let p = new Network([2, 1]);
   let trainIndex = 0;
+
+  const reset = () => {
+    p = new Network([2, 1]);
+  }
 
   const setup = (p5: any, canvasParentRef: any) => {
     // use parent to render the canvas in this ref
@@ -38,17 +44,19 @@ function LinearTest() {
     let p4: Point = new Point(1, p.guessY(1))
     p5.line(p3.getX(), p3.getY(), p4.getX(), p4.getY());
 
+    let right_guesses = 0
 
     for (let i = 0; i < points.length; i++) {
       const inputs = [points[i].x, points[i].y];
       const target = points[i].label;
 
-      let guess = Math.sign(p.feedForward(inputs).toArray()[0] * 2 -1);
+      let guess = p.feedForward(inputs).toArray()[0];
       
       // il label è sempre 1 o -1
-      if (guess == target) {  
+      if (Math.abs(target - guess) <= 0.5) {  
         // se prov ad indovinare ed è giusto bene coloro di verde
         p5.fill(0, 255, 0); // verde
+        right_guesses ++
       } else {
         // se invece è sbagliato coloro di rosso
         p5.fill(255, 0, 0); // ross0
@@ -56,19 +64,31 @@ function LinearTest() {
       p5.ellipse(points[i].getX(), points[i].getY(), 16, 16);
     }
 
+    let percent = 1.5 - (right_guesses / points.length)
+
     let training = points[trainIndex];
     const inputs = [training.x, training.y];
     const target = training.label;
-    p.train(inputs, [target], 0.1);
+    p.train(inputs, [target], percent * 0.2);
     trainIndex++;
     if (trainIndex == points.length) {
       trainIndex = 0;
-      // console.log(p.we)
-      
     }
   };
 
-  return <Sketch setup={setup} draw={draw} className="prova" />;
+  return (
+    <div className="perceptron-wrap">
+      <Sketch setup={setup} draw={draw} className="sketch" />
+      <div className="description">
+        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Similique reprehenderit vero nisi enim minima animi dignissimos quaerat labore ad in saepe velit voluptate amet veniam laborum officiis fugit, sunt reiciendis?
+      </div>
+      <div className="reset-btn" onClick={reset}>
+        Reset
+      </div>
+    </div>
+  );
 }
+
+let k = 0
 
 export default LinearTest;

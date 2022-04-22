@@ -22,13 +22,13 @@ const Navbar = () =>{
   return(
     <div className='navbar-wrap'>
       <div className="info-wrap">
-a
+        Neural Network
       </div>
       <div className="navigation-wrap">
         <LinkTag name="home" route="/" selected={indexSelected == 0} onSelect={() => setIndexSelected(0)} />
-        <LinkTag name="mnist" route="/mnist" selected={indexSelected == 1} onSelect={() => setIndexSelected(1)} />
-        <LinkTag name="xor" route="/xor" selected={indexSelected == 2} onSelect={() => setIndexSelected(2)} />
         <LinkTag name="line" route="/line" selected={indexSelected == 3} onSelect={() => setIndexSelected(3)} />
+        <LinkTag name="xor" route="/xor" selected={indexSelected == 2} onSelect={() => setIndexSelected(2)} />
+        <LinkTag name="mnist" route="/mnist" selected={indexSelected == 1} onSelect={() => setIndexSelected(1)} />
       </div>
     </div>
   )

@@ -27,7 +27,7 @@ export class Point{
     if(this.y > lineY){
       this.label = 1;
     }else {
-      this.label= -1
+      this.label= 0
     }
   }
 
