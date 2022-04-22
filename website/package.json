@@ -2,7 +2,7 @@
   "name": "ML-perceptron",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://github.com/tomm2000/ML-perceptron",
+  "homepage": "https://tomm2000.github.io/ML-perceptron/",
   "dependencies": {
     "@types/jest": "^27.0.1",
     "@types/node": "^16.7.13",
